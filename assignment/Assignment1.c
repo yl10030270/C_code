@@ -72,35 +72,7 @@ int is_valid_score(const int score){
 }
 
 int get_valid_score(void){
-	char line[LINESIZE];
-	int scan;
-	int score;
-	char c;
-	while(1){
-		printf("Please enter student's score.\n");
-		
-		if(!fgets(line,LINESIZE,stdin)){
-			clearerr(stdin);
-			return -1;
-		}
-				
-		sscanf(line,"%s", line);
-		scan = sscanf(line,"%d%c", &score ,&c);
-		
-		if(scan == 0 || scan == -1 || scan == 2){
-			continue;
-		}
-		
-		if(score == -1){
-			return -1;
-		}
-		
-		if(!is_valid_score(score)){
-			continue;
-		}
-		
-		return score;		
-	}
+
 }
 
 void append_records(FILE *fp,char firstname[],char lastname[],const int score){	
@@ -153,7 +125,7 @@ int display_record_n(FILE *fp, const int n){
 		return 1;
 	}
 	
-	fprintf(stderr,"%s, %s: %d\n",firstname,lastname,score);
+	fprintf(stderr,"%s, %s: %d\n",lastname,firstname,score);
 	return 1;
 }
 
@@ -173,7 +145,7 @@ int display_records_from_n(FILE *fp, const int n){
 	}
 	
 	while(1){					
-		fprintf(stderr,"%s, %s: %d\n",firstname,lastname,score);
+		fprintf(stderr,"%s, %s: %d\n",lastname,firstname,score);
 		if(fscanf(fp,"%s%s%d",firstname,lastname,&score) != 3){
 			break;
 		}
