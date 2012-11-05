@@ -34,7 +34,7 @@ int range_type(const char s[]){
 	return 3;
 }
 
-/*int range_type2(const char s[]){
+int range_type2(const char s[]){
 	int type;
 	int pos;
 	char b[100];
@@ -63,9 +63,9 @@ int range_type(const char s[]){
 	}	
 	
 	return scanvalue;		
-}*/
+}
 
-/*int set_range(const char range[],char to_print[]){
+int set_range(const char range[],char to_print[]){
 	int type;
 	int pos;
 	int counter;
@@ -108,7 +108,7 @@ int range_type(const char s[]){
 		}
 		return 1;
 	}		
-}*/
+}
 
 
 int main(void){
