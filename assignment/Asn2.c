@@ -15,8 +15,9 @@
 /*command option type for f*/
 #define F_OPTION 2
 /*default delimiter for f option*/
-#define DELIMITER ','
-
+#ifndef DELIMITER
+	#define DELIMITER ','
+#endif
 /*print out error message and usage.*/
 void usage(const char *s) {
     const char us[] = "usage: cut -cLIST/-fLIST [-n] [--] FilePath";
@@ -45,6 +46,10 @@ int get_valid_com(const int n, const char *ar[], char *option, int *negate, int 
             strcpy(option, ar[i]);
             retval = F_OPTION;
         } else if (ar[i][1] == 'n') {
+            if(ar[i][2] != '\0'){
+            	usage("-n option followed with other charactors.");
+            	return 0;	
+            }            
             (*negate)++;
         } else {
             usage("unknowed option.");
