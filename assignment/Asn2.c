@@ -20,9 +20,9 @@
 #endif
 /*print out error message and usage.*/
 void usage(const char *s) {
-    const char us[] = "usage: cut -cLIST/-fLIST [-n] [--] FilePath";
-    printf("%s\n", s);
-    printf("%s\n", us);
+    const char *us = "usage: cut -cLIST/-fLIST [-n] [--] FilePath";
+    fprintf(stderr,"%s\n", s);
+    fprintf(stderr,"%s\n", us);
 }
 
 /*test if the commond is valid.
@@ -88,30 +88,25 @@ return 3 for range type N:M
 int range_type(const char s[]) {
     size_t i;
     int counter = 0;
-    if (!isdigit(s[0])) {
-        return 0;
-    }
+    if (!isdigit(s[0])) 
+        return 0;    
     for (i = 0; s[i] != '\0'; i++) {
         if (!isdigit(s[i])) {
-            if (s[i] == ':') {
+            if (s[i] == ':') 
                 counter++;
-            } else {
+            else 
                 return 0;
-            }
         }
     }
-    if (counter > 1) {
+    if (counter > 1) 
         return 0;
-    }
-    if (counter == 0) {
+    if (counter == 0)
         return 1;
-    }
-    if (s[i - 1] == ':') {
+    if (s[i - 1] == ':')
         return 2;
-    }
     return 3;
 }
-
+/*for each range in the option ,set up the to_print array*/
 int set_each_range(const char range[], int to_print[]) {
     int type;
     int pos;
@@ -119,31 +114,28 @@ int set_each_range(const char range[], int to_print[]) {
     int i;
     type = range_type(range);
     if (type == 0) {
-        printf("invalid option range %s\n", range);
+        fprintf(stderr,"invalid option range %s\n", range);
         return 0;
     }
 
     sscanf(range, "%d:%d", &pos, &counter);
 
-    if (pos >= 1024) {
+    if (pos >= 1024)
         return 1;
-    }
     if (type == 1) {
         to_print[pos - 1] = 1;
         return 1;
     }
     if (type == 2) {
-        for (i = pos - 1; i < 1024; i++) {
+        for (i = pos - 1; i < 1024; i++)
             to_print[i] = 1;
-        }
         return 1;
     }
-    for (i = pos - 1; i < pos + counter - 1 && i < 1024; i++) {
+    for (i = pos - 1; i < pos + counter - 1 && i < 1024; i++)
         to_print[i] = 1;
-    }
     return 1;
 }
-
+/*decomposite the option string to each indivadual range string*/
 char *get_range(char *range, char *option) {
     while (*option != ',' && *option != '\0')
         *range++ = *option++;
@@ -151,26 +143,26 @@ char *get_range(char *range, char *option) {
     return (*option == ',') ? option + 1 : option;
 }
 
+/*combine all the ranges in the option to set up the to_print array, 
+preparing for printing.
+*/
 int set_range(char *option, int *to_print, const int negate) {
     char range[BUFSIZE];
     size_t i;
     option = option + 2;
-
     do {
         option = get_range(range, option);
-        if (!set_each_range(range, to_print)) {
+        if (!set_each_range(range, to_print))
             return 0;
-        }
     } while (*option != '\0');
 
-    if (negate > 0) {
-        for (i = 0; i < BUFSIZE; i++) {
+    if (negate > 0)
+        for (i = 0; i < BUFSIZE; i++)
             to_print[i] = (to_print[i] - 1) * -1;
-        }
-    }
     return 1;
 }
 
+/*display the required columns for option -c*/
 void display_c(FILE *fp, const int *to_print) {
     char line[BUFSIZE];
     size_t i;
@@ -179,15 +171,14 @@ void display_c(FILE *fp, const int *to_print) {
             clearerr(fp);
             break;
         }
-        for (i = 0; line[i] != '\0' && line[i] != '\n'; i++) {
-            if (to_print[i] == 1) {
+        for (i = 0; line[i] != '\0' && line[i] != '\n'; i++)
+            if (to_print[i] == 1)
                 putchar(line[i]);
-            }
-        }
         printf("\n");
     }
 }
 
+/*display the required columns for option -f*/
 void display_f(FILE *fp, const int *to_print) {
     char line[BUFSIZE];
     size_t i;
@@ -204,28 +195,27 @@ void display_f(FILE *fp, const int *to_print) {
         comma = 0;
         for (i = 0; end != NULL; i++) {
             if (to_print[i] == 1) {
-                if (comma == 1) {
+                if (comma == 1)
                     putchar(DELIMITER);
-                }
                 while (start < end)
                     putchar(*start++);
                 comma = 1;
-            } else {
+            } else 
                 start = end;
-            }
             start++;
             end = strchr(start, DELIMITER);
         }
         if (to_print[i] == 1) {
-            putchar(DELIMITER);
-            while (*start != '\n' && *start != '\0') {
+            if(comma == 1)
+            	putchar(DELIMITER);
+            while (*start != '\n' && *start != '\0')
                 putchar(*start++);
-            }
         }
         printf("\n");
     }
 }
 
+/*programe main entry*/
 int main(const int argc, const char *argv[]) {
     char option[BUFSIZE];
     int to_print[BUFSIZE];
@@ -234,13 +224,11 @@ int main(const int argc, const char *argv[]) {
     int type;
     int i;
     FILE *fp;
-
     type = get_valid_com(argc, argv, option, &negate, &fpos);
     if (type == 0)
         return 1;
-    if (!set_range(option, to_print, negate)) {
+    if (!set_range(option, to_print, negate))
         return 2;
-    }
     for (i = fpos; i < argc; i++) {
         if ((fp = fopen(argv[i], "r+b")) == 0) {
             perror("fopen");
